@@ -1,1 +1,4 @@
-Run `ts-node main.ts` to run each problem's test case.
+## Bioinformatics Algorithms Book Club
+
+Steve Losh: [Problem Solutions](https://hg.stevelosh.com/bial/file)
+Kevin West: [Problem Solutions](https://github.com/kevin-west-10x/bioinformatics-algorithms)
