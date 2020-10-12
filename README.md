@@ -1,0 +1,1 @@
+Run `ts-node main.ts` to run each problem's test case.
