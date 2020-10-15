@@ -7,6 +7,7 @@ const BA1M = (index: number, size: number) => indexToPattern(index, size);
 
 // Test data
 assertEqual(
+  "BA1M",
   BA1M(45, 4),
   "AGTC"
 );

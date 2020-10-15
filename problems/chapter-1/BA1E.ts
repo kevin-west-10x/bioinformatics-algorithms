@@ -23,6 +23,7 @@ const BA1E = (text: string, size: number, clumpSize: number, frequency: number) 
 
 // Test data
 assertEqual(
+  "BA1E",
   BA1E(
     "CGGACTCGACAGATGTGAAGAAATGTGAAGACTGAGTGAAGAGAAGAGGAAACACGACACGACATTGCGACATAATGTACGAATGTAATGTGCCTATGGC",
     5,

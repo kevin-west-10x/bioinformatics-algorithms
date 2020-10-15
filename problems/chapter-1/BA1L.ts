@@ -6,6 +6,7 @@ const BA1L = (pattern: string) => patternToIndex(pattern);
 
 // Test data
 assertEqual(
+  "BA1L",
   BA1L("AGT"),
   11
 );

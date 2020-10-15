@@ -12,6 +12,7 @@ const BA1H = (text: string, pattern: string, distance: number) =>
 
 // Test data
 assertEqual(
+  "BA1H",
   BA1H(
     "CGCCCGAATCCAGAACGCATTCCCATATTTCGGGACCACTGGCCTCCACGGTACGGACGTCAATCAAATGCCTAGCGGCTTGTGGTTTCTCCTACGCTCC",
     "ATTCTGGA",

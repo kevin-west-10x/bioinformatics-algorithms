@@ -5,4 +5,4 @@ import { assertEqual } from "../../utilities/test";
 const BA1C = (text: string) => reverseComplement(text);
 
 // Test data
-assertEqual(BA1C("AAAACCCGGT"), "ACCGGGTTTT");
+assertEqual("BA1C", BA1C("AAAACCCGGT"), "ACCGGGTTTT");

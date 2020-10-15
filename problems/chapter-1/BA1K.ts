@@ -11,6 +11,7 @@ const BA1K = (text: string, size: number) =>
 
 // Test data
 assertEqual(
+  "BA1K",
   BA1K(
     "ACGCGGCTCTGAAA",
     2

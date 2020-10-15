@@ -24,6 +24,7 @@ const BA1J = (text: string, size: number, distance: number) =>
 
 // Test data
 assertEqual(
+  "BA1J",
   BA1J(
     "ACGTTGCATGTCGCATGATGCATGAGAGCT",
     4,

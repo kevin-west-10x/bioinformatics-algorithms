@@ -1,7 +1,7 @@
-export const assertEqual = <Type>(result: Type, expected: Type) => {
-  if (result !== expected) {
-    console.error(`${result} !== ${expected}`);
+export const assertEqual = <Type>(name: string, result: Type, ...expected: Type[]) => {
+  if (expected.every(value => value !== result)) {
+    console.error(`${name}: ${result} !== ${expected}`);
   } else {
-    console.log("Test Passed");
+    console.log(`${name}: Test Passed`);
   }
 }

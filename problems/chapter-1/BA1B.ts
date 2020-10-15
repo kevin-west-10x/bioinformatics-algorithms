@@ -6,4 +6,4 @@ import { assertEqual } from "../../utilities/test";
 const BA1B = (text: string, size: number) => countMax(frequencyCounter(text, size));
 
 // Test data
-assertEqual(Object.keys(BA1B("ACGTTGCATGTCGCATGATGCATGAGAGCT", 4)).sort().join(" "), "CATG GCAT");
+assertEqual("BA1B", Object.keys(BA1B("ACGTTGCATGTCGCATGATGCATGAGAGCT", 4)).sort().join(" "), "CATG GCAT");

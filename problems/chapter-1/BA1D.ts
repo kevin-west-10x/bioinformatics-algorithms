@@ -6,4 +6,4 @@ const BA1D = (text: string, pattern: string) =>
   patternReduce<number[]>(text, pattern, (indices, index) => [...indices, index], []);
 
 // Test data
-assertEqual(BA1D("GATATATGCATATACTT", "ATAT").sort().join(" "), "1 3 9");
+assertEqual("BA1D", BA1D("GATATATGCATATACTT", "ATAT").sort().join(" "), "1 3 9");

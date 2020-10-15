@@ -6,4 +6,4 @@ const BA1A = (text: string, pattern: string) =>
   patternReduce(text, pattern, (count) => count + 1, 0);
 
 // Test data
-assertEqual(BA1A("GCGCG", "GCG"), 2);
+assertEqual("BA1A", BA1A("GCGCG", "GCG"), 2);

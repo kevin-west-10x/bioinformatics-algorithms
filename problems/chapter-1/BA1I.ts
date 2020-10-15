@@ -18,6 +18,7 @@ const BA1I = (text: string, size: number, distance: number) =>
 
 // Test data
 assertEqual(
+  "BA1I",
   BA1I(
     "ACGTTGCATGTCGCATGATGCATGAGAGCT",
     4,
