@@ -6,26 +6,29 @@ import { wordReduce } from "./word";
 export type NumberTuple<Size extends number> = Tuple<Size, number>;
 export type Profile<Size extends number, T = NumberTuple<Size>> = [T, T, T, T];
 
-const constructTuple = <Size extends number, T extends NumberTuple<Size>>(size: Size): T =>
-  new Array<number>(size).fill(0) as T;
+const constructTuple = <Size extends number, T extends NumberTuple<Size>>(size: Size, pseudoCount: number): T =>
+  new Array<number>(size).fill(pseudoCount) as T;
 
-const constructDefaultProfile = <Size extends number, T extends NumberTuple<Size>>(size: Size): Profile<Size, T> => [
-  constructTuple<Size, T>(size),
-  constructTuple<Size, T>(size),
-  constructTuple<Size, T>(size),
-  constructTuple<Size, T>(size)
+const constructDefaultProfile = <Size extends number, T extends NumberTuple<Size>>(size: Size, pseudoCount: number): Profile<Size, T> => [
+  constructTuple<Size, T>(size, pseudoCount),
+  constructTuple<Size, T>(size, pseudoCount),
+  constructTuple<Size, T>(size, pseudoCount),
+  constructTuple<Size, T>(size, pseudoCount)
 ];
 
-export const constructProfile = <Size extends number, T extends NumberTuple<Size>>(patterns: string[], size: Size): Profile<Size, T> =>
+const transformProbability = (value: number, length: number, pseudoCount: number) =>
+  value / (length + (4 * pseudoCount));
+
+export const constructProfile = <Size extends number, T extends NumberTuple<Size>>(patterns: string[], size: Size, pseudoCount: number = 1): Profile<Size, T> =>
   patterns.reduce<Profile<Size, T>>(
     (profile, pattern, _, { length }) => {
       if (pattern.length !== size) {
         throw new Error("Invalid pattern size to construct profile");
       }
-      pattern.split("").forEach((base, index) => profile[indexFromBase(base)][index] += 1/length);
+      pattern.split("").forEach((base, index) => profile[indexFromBase(base)][index] += transformProbability(1, length, pseudoCount));
       return profile;
     },
-    constructDefaultProfile<Size, T>(size)
+    constructDefaultProfile<Size, T>(size, transformProbability(pseudoCount, patterns.length, pseudoCount))
   );
 
 export interface ProfileMostProbable {
