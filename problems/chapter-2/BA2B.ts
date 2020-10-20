@@ -1,5 +1,6 @@
 import hammingDistance from "../../utilities/hammingDistance";
 import neighbors from "../../utilities/neighbors";
+import { pickMin } from "../../utilities/pick";
 import { assertEqual } from "../../utilities/test";
 import { wordReduce } from "../../utilities/word";
 
@@ -11,20 +12,23 @@ interface MedianString {
 // Reduce across all patterns of `size` and set median when finding lower distance
 const BA2B = (texts: string[], size: number): string =>
   neighbors("A".repeat(size), size).reduce<MedianString>(
-    (median, pattern) => {
-      // Sum minimum distances across each text for pattern
-      const distance = texts.reduce(
-        // Reduce across all words in text to find minimum hamming distance
-        (distance, text) => distance + wordReduce(
-          text,
-          size,
-          (min, word) => Math.min(hammingDistance(pattern, word), min),
-          Infinity
+    (median, pattern) => pickMin(
+      item => item.distance,
+      median,
+      {
+        distance: texts.reduce(
+          // Reduce across all words in text to find minimum hamming distance
+          (distance, text) => distance + wordReduce(
+            text,
+            size,
+            (min, word) => Math.min(hammingDistance(pattern, word), min),
+            Infinity
+          ),
+          0
         ),
-        0
-      );
-      return distance < median.distance ? { distance, pattern } : median;
-    },
+        pattern,
+      }
+    ),
     {
       distance: Infinity,
       pattern: "",

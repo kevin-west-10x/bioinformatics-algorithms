@@ -3,7 +3,7 @@ import { wordReduce } from "./word";
 
 export type FrequencyTable = Record<string, number>;
 
-const incrementCounts = (counts: FrequencyTable, key: string) => ({ ...counts, [key]: (counts[key] || 0) + 1 });
+export const incrementCounts = (counts: FrequencyTable, key: string) => ({ ...counts, [key]: (counts[key] || 0) + 1 });
 
 /**
  * A function which takes in a text and word length, and returns a FrequencyTable containing the
