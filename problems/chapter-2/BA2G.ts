@@ -1,10 +1,8 @@
-import { incrementCounts } from "../../utilities/frequency";
 import { repeat } from "../../utilities/functional";
 import { scoreMotifs } from "../../utilities/motif";
 import { pickMin } from "../../utilities/pick";
 import { constructProfile, patternProbability } from "../../utilities/profile";
 import { randomIndexWeighted, randomInt, selectRandom } from "../../utilities/random";
-import { parseInput } from "../../utilities/string";
 import { assertEqual } from "../../utilities/test";
 import { wordReduce } from "../../utilities/word";
 
