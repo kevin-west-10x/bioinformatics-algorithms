@@ -31,6 +31,17 @@ export const constructProfile = <Size extends number, T extends NumberTuple<Size
     constructDefaultProfile<Size, T>(size, transformProbability(pseudoCount, patterns.length, pseudoCount))
   );
 
+// Calculate probability by converting character to index of row in profile, picking the
+// probability at the index of the character in the pattern, and multiplying them all together
+export const patternProbability = (pattern: string, profile: Profile<number>): number =>
+  pattern
+    .split("")
+    .map(indexFromBase)
+    .reduce(
+      (probability, baseIndex, letterIndex) => probability * profile[baseIndex][letterIndex],
+      1
+    )
+
 export interface ProfileMostProbable {
   pattern: string;
   probability: number;
@@ -50,15 +61,7 @@ export const profileMostProbable = <Size extends number, T extends NumberTuple<S
         profileMostProbable,
         {
           pattern,
-          // Calculate probability by converting character to index of row in profile, picking the
-          // probability at the index of the character in the pattern, and multiplying them all together
-          probability: pattern
-            .split("")
-            .map(indexFromBase)
-            .reduce(
-              (probability, baseIndex, letterIndex) => probability * profile[baseIndex][letterIndex],
-              1
-            )
+          probability: patternProbability(pattern, profile)
         }
       ),
     {

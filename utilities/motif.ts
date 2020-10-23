@@ -9,8 +9,10 @@ const scoreIndex = (motifs: string[], index: number): number =>
 
 export const scoreMotifs = memoize(
   (motifs: string[]): number => 
-    motifs[0].split("").reduce(
-      (score, _, index) => score + scoreIndex(motifs, index),
-      0
-    )
+    motifs.length === 0
+      ? Infinity
+      : motifs[0].split("").reduce(
+          (score, _, index) => score + scoreIndex(motifs, index),
+          0
+        )
 );

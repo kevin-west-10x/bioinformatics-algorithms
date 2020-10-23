@@ -1,0 +1,1 @@
+export const parseInput = (str: string): string[] => str.trim().split("\n").map(s => s.trim());
