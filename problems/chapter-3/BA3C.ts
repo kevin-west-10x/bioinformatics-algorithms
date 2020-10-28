@@ -20,11 +20,11 @@ assertEqual(
     )
   ),
   formatGraph(
-    [
-      ["AGGCA", "GGCAT"],
-      ["CATGC", "ATGCG"],
-      ["GCATG", "CATGC"],
-      ["GGCAT", "GCATG"]
-    ]
+    {
+      AGGCA: ["GGCAT"],
+      CATGC: ["ATGCG"],
+      GCATG: ["CATGC"],
+      GGCAT: ["GCATG"]
+    }
   )
 );

@@ -6,6 +6,14 @@ export const repeat = <T>(times: number, fn: (arg: T) => T, initialValue: T): T 
   return value;
 }
 
+export const doWhile = <T>(condition: (arg: T) => boolean, fn: (arg: T) => T, initialValue: T): T => {
+  let value = initialValue;
+  while (condition(value)) {
+    value = fn(value);
+  }
+  return value;
+}
+
 export const accumulate = <T extends Record<any, any>, Key extends keyof T>(
   record: T,
   key: Key,

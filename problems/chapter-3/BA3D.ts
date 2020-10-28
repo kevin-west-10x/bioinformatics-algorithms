@@ -13,16 +13,15 @@ assertEqual(
   "BA3D",
   formatGraph(BA3D("AAGATTCTCTAC", 4)),
   formatGraph(
-    [
-      ["AAG", "AGA"],
-      ["AGA", "GAT"],
-      ["ATT", "TTC"],
-      ["CTA", "TAC"],
-      ["CTC", "TCT"],
-      ["GAT", "ATT"],
-      ["TCT", "CTA"],
-      ["TCT", "CTC"],
-      ["TTC", "TCT"]
-    ]
+    {
+      AAG: ["AGA"],
+      AGA: ["GAT"],
+      ATT: ["TTC"],
+      CTA: ["TAC"],
+      CTC: ["TCT"],
+      GAT: ["ATT"],
+      TCT: ["CTA", "CTC"],
+      TTC: ["TCT"]
+    }
   )
 );
