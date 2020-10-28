@@ -1,9 +1,10 @@
+import { accumulate } from "./functional";
 import memoize from "./memoize";
 import { wordReduce } from "./word";
 
 export type FrequencyTable = Record<string, number>;
 
-export const incrementCounts = (counts: FrequencyTable, key: string) => ({ ...counts, [key]: (counts[key] || 0) + 1 });
+export const incrementCounts = (counts: FrequencyTable, key: string) => accumulate(counts, key, num => num + 1, 0);
 
 /**
  * A function which takes in a text and word length, and returns a FrequencyTable containing the

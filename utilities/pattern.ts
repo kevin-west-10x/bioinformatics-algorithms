@@ -20,3 +20,6 @@ export const patternReduce = <Result>(
       : currentResult,
     initialResult
   );
+
+  export const prefix = (pattern: string): string => pattern.slice(0, -1);
+  export const suffix = (pattern: string): string => pattern.slice(1);
