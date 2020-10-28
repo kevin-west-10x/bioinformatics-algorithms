@@ -1,9 +1,9 @@
 import { formatGraph } from "../../utilities/format";
-import { constructGraph, Graph } from "../../utilities/graph";
+import { constructOverlapGraph, Graph } from "../../utilities/graph";
 import { assertEqual } from "../../utilities/test";
 
 // Reduce across each pattern and add it to the adjacency list
-const BA3C = (patterns: string[]): Graph => constructGraph(patterns);
+const BA3C = (patterns: string[]): Graph => constructOverlapGraph(patterns);
 
 // Test data
 assertEqual(

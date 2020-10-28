@@ -1,15 +1,11 @@
 import { formatGraph } from "../../utilities/format";
-import { Graph } from "../../utilities/graph";
-import { prefix, suffix } from "../../utilities/pattern";
+import { constructGraph, Graph } from "../../utilities/graph";
 import { assertEqual } from "../../utilities/test";
 import { wordReduce } from "../../utilities/word";
 
 // Reduce across each pattern and add it to the adjacency list
-const BA3D = (text: string, size: number): Graph => wordReduce<Graph>(
-  text,
-  size,
-  (graph, word) => [...graph, [prefix(word), suffix(word)]],
-  []
+const BA3D = (text: string, size: number): Graph => constructGraph(
+  wordReduce<string[]>(text, size, (edges, word) => [...edges, word], [])
 );
 
 // Test data

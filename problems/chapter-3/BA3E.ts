@@ -1,13 +1,9 @@
 import { formatGraph } from "../../utilities/format";
-import { Graph } from "../../utilities/graph";
-import { prefix, suffix } from "../../utilities/pattern";
+import { constructGraph, Graph } from "../../utilities/graph";
 import { assertEqual } from "../../utilities/test";
 
 // Reduce across each pattern and add it to the adjacency list
-const BA3E = (texts: string[]): Graph => texts.reduce<Graph>(
-  (graph, text) => [...graph, [prefix(text), suffix(text)]],
-  []
-);
+const BA3E = (texts: string[]): Graph => constructGraph(texts);
 
 // Test data
 assertEqual(
