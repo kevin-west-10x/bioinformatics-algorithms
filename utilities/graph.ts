@@ -2,6 +2,8 @@ import { accumulate } from "./functional";
 import memoize from "./memoize";
 import { prefix, suffix } from "./pattern";
 
+export type Edge = [string, string];
+
 export type Graph = Record<string, string[]>;
 
 const prefixMap = memoize((patterns: string[]): Record<string, string[]> =>

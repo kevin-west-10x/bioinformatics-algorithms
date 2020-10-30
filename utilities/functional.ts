@@ -16,10 +16,11 @@ export const doWhile = <T>(condition: (arg: T) => boolean, fn: (arg: T) => T, in
 
 export const accumulate = <T extends Record<any, any>, Key extends keyof T>(
   record: T,
-  key: Key,
+  key: Key | Key[],
   accumulator: (current: T[Key]) => T[Key],
   initial: T[Key]
 ): T => {
-  record[key] = accumulator(record[key] || initial)
+  const keys = key instanceof Array ? key : [key];
+  keys.forEach(key => record[key] = accumulator(record[key] || initial));
   return record;
 }
