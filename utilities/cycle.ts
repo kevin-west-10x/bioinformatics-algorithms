@@ -11,23 +11,24 @@ export const pivot = (cycle: string[], on: string): string[] => (
   (index: number) => [...cycle.slice(index, -1), ...cycle.slice(0, index), on]
 )(cycle.indexOf(on));
 
-export const getUnbalancedEdge = (graph: Graph): Edge =>
-  Object.entries(
-    Object.entries(graph).reduce<Record<string, number>>(
-      (balances, [start, endings]) => accumulate(
-        accumulate(
-          balances,
-          start,
-          num => num + endings.length,
-          0
-        ),
-        endings,
-        num => num - 1,
+export const getNodeCount = (graph: Graph): Record<string, number> =>
+  Object.entries(graph).reduce<Record<string, number>>(
+    (balances, [start, endings]) => accumulate(
+      accumulate(
+        balances,
+        start,
+        num => num + endings.length,
         0
       ),
-      {}
-    )
-  ).reduce<Edge>(
+      endings,
+      num => num - 1,
+      0
+    ),
+    {}
+  );
+
+export const getUnbalancedEdge = (graph: Graph): Edge =>
+  Object.entries(getNodeCount(graph)).reduce<Edge>(
     (edge, [node, count]) =>
       count === -1
         ? [node, edge[1]]
