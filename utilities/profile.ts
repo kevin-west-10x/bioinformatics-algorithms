@@ -1,4 +1,4 @@
-import { indexFromBase } from "./lexographic";
+import { DNA, indexFromBase } from "./lexographic";
 import { pickMax } from "./pick";
 import { Tuple } from "./tuple";
 import { wordReduce } from "./word";
@@ -25,7 +25,7 @@ export const constructProfile = <Size extends number, T extends NumberTuple<Size
       if (pattern.length !== size) {
         throw new Error("Invalid pattern size to construct profile");
       }
-      pattern.split("").forEach((base, index) => profile[indexFromBase(base)][index] += transformProbability(1, length, pseudoCount));
+      pattern.split("").forEach((base, index) => profile[indexFromBase(DNA)(base)][index] += transformProbability(1, length, pseudoCount));
       return profile;
     },
     constructDefaultProfile<Size, T>(size, transformProbability(pseudoCount, patterns.length, pseudoCount))
@@ -36,7 +36,7 @@ export const constructProfile = <Size extends number, T extends NumberTuple<Size
 export const patternProbability = (pattern: string, profile: Profile<number>): number =>
   pattern
     .split("")
-    .map(indexFromBase)
+    .map(indexFromBase(DNA))
     .reduce(
       (probability, baseIndex, letterIndex) => probability * profile[baseIndex][letterIndex],
       1

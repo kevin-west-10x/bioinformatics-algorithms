@@ -1,9 +1,9 @@
-import { indexToPattern } from "../../utilities/lexographic";
+import { DNA, indexToPattern } from "../../utilities/lexographic";
 import { assertEqual } from "../../utilities/test";
 
 // Return the pattern at `index` for the lexographical list of all
 // patterns of `size`
-const BA1M = (index: number, size: number) => indexToPattern(index, size);
+const BA1M = (index: number, size: number) => indexToPattern(DNA)(index, size);
 
 // Test data
 assertEqual(

@@ -1,10 +1,10 @@
-import { constructPath } from "../../utilities/cycle";
+import { constructPath, Path } from "../../utilities/cycle";
 import { formatCycle } from "../../utilities/format";
 import { Graph } from "../../utilities/graph";
 import { parseGraph } from "../../utilities/string";
 import { assertEqual } from "../../utilities/test";
 
-const BA3G = (graph: Graph): string[] => constructPath(graph);
+const BA3G = (graph: Graph): Path => constructPath(graph);
 
 // Test data
 assertEqual(

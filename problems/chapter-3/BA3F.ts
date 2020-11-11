@@ -1,10 +1,10 @@
-import { constructCycle, pivot } from "../../utilities/cycle";
+import { constructCycle, Cycle } from "../../utilities/cycle";
 import { formatCycle } from "../../utilities/format";
 import { Graph } from "../../utilities/graph";
 import { parseGraph } from "../../utilities/string";
 import { assertEqual } from "../../utilities/test";
 
-const BA3F = (graph: Graph): string[] => constructCycle(graph);
+const BA3F = (graph: Graph): Cycle => constructCycle(graph);
 
 // Test data
 assertEqual(

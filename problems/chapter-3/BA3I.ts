@@ -7,7 +7,7 @@ const BA3I = (size: number): string => constructPath(
   constructGraph(
     neighbors(new Array(size).fill("0").join(""), size, ["0", "1"])
   )
-).reduce(
+).slice(0, -1).reduce(
   (text, pattern) => text + pattern[pattern.length - 1],
   ""
 );

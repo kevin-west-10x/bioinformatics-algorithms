@@ -1,4 +1,3 @@
-import { indexToPattern } from "../../utilities/lexographic";
 import neighbors from "../../utilities/neighbors";
 import { assertEqual } from "../../utilities/test";
 

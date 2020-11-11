@@ -1,28 +1,31 @@
 import { constructPath } from "../../utilities/cycle";
 import { constructPairGraph } from "../../utilities/graph";
-import { pairReduce } from "../../utilities/pair";
+import { pairSplice } from "../../utilities/pair";
 import { parseInput } from "../../utilities/string";
 import { assertEqual } from "../../utilities/test";
 
-const BA3J = (distance: number, texts: string[]): string => pairReduce(
+const BA3J = (texts: string[], distance: number): string => pairSplice(
   constructPath(constructPairGraph(texts)),
-  distance,
-  (text, value) => text + value[value.length - 1]
-)
+  Math.floor(texts[0].length / 2),
+  distance
+);
 
 // Test data
 assertEqual(
   "BA3J",
-  BA3J(2, parseInput(`
-    GAGA|TTGA
-    TCGT|GATG
-    CGTG|ATGT
-    TGGT|TGAG
-    GTGA|TGTT
-    GTGG|GTGA
-    TGAG|GTTG
-    GGTC|GAGA
-    GTCG|AGAT
-  `)),
+  BA3J(
+    parseInput(`
+      GAGA|TTGA
+      TCGT|GATG
+      CGTG|ATGT
+      TGGT|TGAG
+      GTGA|TGTT
+      GTGG|GTGA
+      TGAG|GTTG
+      GGTC|GAGA
+      GTCG|AGAT
+    `),
+    2
+  ),
   "GTGGTCGTGAGATGTTGA",
 );
