@@ -1,4 +1,4 @@
-import { textToPeptide } from "../../utilities/genetics";
+import { fromAminoPeptide, textToPeptide } from "../../utilities/genetics";
 import { DNA, RNA, translate } from "../../utilities/lexographic";
 import reverseComplement from "../../utilities/reverseComplement";
 import { assertEqual } from "../../utilities/test";
@@ -13,8 +13,8 @@ const BA4B = (text: string, peptide: string): string[] => wordReduce<string[]>(
   []
 ).filter(
   (word): word is string =>
-    textToPeptide(toRna(word)) === peptide ||
-    textToPeptide(toRna(reverseComplement(word))) === peptide
+    fromAminoPeptide(textToPeptide(toRna(word))) === peptide ||
+    fromAminoPeptide(textToPeptide(toRna(reverseComplement(word)))) === peptide
 );
 
 // Test data
