@@ -1,4 +1,4 @@
-import { backtrack, computePathFromMatrix, MatrixPredecessor, Path } from "../../utilities/matrix";
+import { backtrack, computePathFromMatrix, MatrixPredecessor } from "../../utilities/matrix";
 import { assertEqual } from "../../utilities/test";
 
 const constructMatrixPredecessor = (
@@ -13,12 +13,6 @@ const constructMatrixPredecessor = (
   x,
   y
 });
-
-interface LCSReducer {
-  backtrack: Path;
-  index: number;
-  lcs: string;
-}
 
 const BA5C = (str1: string, str2: string): string => (
   (width: number, height: number) => backtrack(

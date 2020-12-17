@@ -9,6 +9,8 @@ export type Stop = typeof STOP;
 export const MASSES = [57, 71, 87, 97, 99, 101, 103, 113, 114, 115, 128, 129, 131, 137, 147, 156, 163, 186] as const;
 export type Mass = typeof MASSES[number];
 
+export const aminoIndex = memoize((amino: Amino): number => AMINOS.indexOf(amino));
+
 export const newAminoPeptide = (str: string): AminoPeptide => {
   const aminos = str.split("").filter((amino): amino is Amino => AMINOS.some(a => a === amino));
   if (aminos.length !== str.length) {
