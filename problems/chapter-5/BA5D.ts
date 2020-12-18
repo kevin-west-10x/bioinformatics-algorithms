@@ -1,4 +1,4 @@
-import { backtrack, computePath, PathWithBacktrack } from "../../utilities/matrix";
+import { computePath } from "../../utilities/dag";
 import { assertEqual } from "../../utilities/test";
 
 type DAG = WeightedEdge[];
@@ -23,23 +23,21 @@ const parseDAG = (dag: string): DAG => dag.trim().split("\n").map(parseEdge);
 
 type Result = [number, number[]];
 
-const BA5D = (source: number, sink: number, dag: DAG): Result => (
-  (pathWithBacktrack: PathWithBacktrack) => backtrack<Result>(
-    pathWithBacktrack,
-    ([weight, path], _, next) => [
-      weight,
-      [next, ...path]
-    ],
-    [pathWithBacktrack.path[sink], [sink]]
-  )
-)(computePath(
-  source,
-  sink,
-  (index, getValue) => dag.filter(edge => edge.end === index).map(edge => ({
+const BA5D = (source: number, sink: number, dag: DAG): Result => 
+computePath({
+  getPredecessors: (index, getValue) => dag.filter(edge => edge.end === index).map(edge => ({
     index: edge.start,
     weight: getValue(edge.start) + edge.weight
-  }))
-));
+  })),
+  sink,
+  source,
+}).reconstruct(
+  ([weight, path], _, next) => [
+    weight,
+    [next, ...path]
+  ],
+  ({ path, sink }) => [path[sink], [sink]]
+);
 
 // Test data
 assertEqual(

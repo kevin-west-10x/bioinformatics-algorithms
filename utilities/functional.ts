@@ -26,3 +26,13 @@ export const accumulate = <T extends Record<any, any>, Key extends keyof T = key
   keys.forEach(key => record[key] = accumulator(record[key] || initial));
   return record;
 }
+
+export const zip = <T>(...arrs: Array<Array<T>>): Array<T> => {
+  const zipped: Array<T> = [];
+  for (let i = 0; i < arrs[0].length; i++) {
+    for (let j = 0; j < arrs.length; j++) {
+      zipped.push(arrs[j][i])
+    }
+  }
+  return zipped;
+}

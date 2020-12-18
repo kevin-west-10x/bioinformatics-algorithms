@@ -1,26 +1,15 @@
-import { computePathFromMatrix, Matrix, MatrixPredecessor } from "../../utilities/matrix";
+import { computeMatrix, constructMatrixPredecessor, Matrix } from "../../utilities/matrix";
 import { parseMatrix } from "../../utilities/string";
 import { assertEqual } from "../../utilities/test";
 
-const constructMatrixPredecessor = (
-  x: number,
-  y: number,
-  weights: Matrix,
-  getValue: (y: number, x: number) => number,
-): MatrixPredecessor => ({
-  weight: x < 0 || y < 0 ? 0 : getValue(x, y) + weights[y][x],
-  x,
-  y
-});
-
-const BA5B = (down: Matrix, right: Matrix): number => computePathFromMatrix(
-  down[0].length,
-  right.length,
-  (x, y, getValue) => [
-    constructMatrixPredecessor(x-1, y, right, getValue),
-    constructMatrixPredecessor(x, y-1, down, getValue)
-  ]
-).path.slice(-1)[0];
+const BA5B = (down: Matrix, right: Matrix): number => computeMatrix({
+  getPredecessors: ({ x, y }, getValue) => [
+    constructMatrixPredecessor({ x: x-1, y }, getValue, ({ x, y }) => right[y][x]),
+    constructMatrixPredecessor({ x, y: y-1 }, getValue, ({ x, y }) => down[y][x])
+  ],
+  height: right.length,
+  width: down[0].length,
+}).matrix.slice(-1)[0].slice(-1)[0];
 
 // Test data
 assertEqual(

@@ -1,159 +1,157 @@
-import { doWhile, repeat } from "./functional";
-import { Amino, aminoIndex } from "./genetics";
-import memoize from "./memoize";
-import { pickMax } from "./pick";
-
-export interface Predecessor {
-  index: number;
-  weight: number;
-}
-
-export type Path = number[];
-
-export interface PathWithBacktrack {
-  backtrack: Path;
-  path: Path;
-  source: number;
-  sink: number;
-}
-export const computePath = (
-  source: number,
-  sink: number,
-  getPredecessors: (index: number, getValue: (index: number) => number) => Predecessor[],
-  outOfBoundsValue: number = -Infinity
-): PathWithBacktrack => repeat<PathWithBacktrack>(
-  sink + 1,
-  ({ backtrack, path, source, sink }, index) => {
-    if (index === source) {
-      path[index] = 0;
-      backtrack[index] = -1;
-    } else {
-      const predecessors = getPredecessors(index, index => path[index] ?? outOfBoundsValue);
-      if (predecessors.length === 0) {
-        path[index] = outOfBoundsValue;
-        backtrack[index] = -1;
-      } else {
-        const maxWeight = pickMax(predecessor => predecessor.weight, ...predecessors).weight;
-        const predecessor = predecessors.find(predecessor => predecessor.weight === maxWeight) || predecessors[0];
-        path[index] = predecessor.weight;
-        backtrack[index] = Math.max(predecessor.index, 0);
-      }
-    }
-    return { backtrack, path, source, sink }
-  },
-  {
-    backtrack: [],
-    path: [],
-    source,
-    sink
-  }
-);
-
-interface BacktrackReducer<T> {
-  index: number;
-  path: PathWithBacktrack;
-  result: T;
-}
-
-export const backtrack = <T>(
-  path: PathWithBacktrack,
-  callback: (result: T, curr: number, next: number) => T,
-  initialResult: T
-): T => doWhile<BacktrackReducer<T>>(
-  ({ index, path }) => index > path.source,
-  ({ index, path, result }) => ({
-    index: path.backtrack[index],
-    path,
-    result: callback(result, index, path.backtrack[index])
-  }),
-  {
-    index: path.sink,
-    path,
-    result: initialResult
-  }
-).result;
+import { computePath, ComputePathOptions, Path, PathResult, PathWithBacktrack, Predecessor, Reconstruct as PathReconstruct } from "./dag";
+import { doWhile } from "./functional";
 
 export type Matrix = number[][];
 
-export interface MatrixPredecessor extends Omit<Predecessor, "index"> {
+export interface Coordinate {
   x: number;
   y: number;
 }
 
-export const computePathFromMatrix = (
+export interface MatrixPredecessor extends Omit<Predecessor, "index">, Coordinate {}
+
+export const constructMatrixPredecessor = (
+  { x, y }: Coordinate,
+  getValue: (coordinate: Coordinate) => number,
+  getWeight: (coordinate: Coordinate) => number
+): MatrixPredecessor => ({
+  weight: x < 0 || y < 0 ? 0 : getValue({x, y}) + getWeight({x, y}),
+  x,
+  y
+});
+
+export interface ComputeMatrixOptions extends Omit<ComputePathOptions, "getPredecessors" | "sink" | "source" | "transform"> {
+  getPredecessors: (coordinate: Coordinate, getValue: (coordinate: Coordinate) => number) => MatrixPredecessor[];
+  height: number;
+  transform?: (matrix: MatrixWithBacktrack) => MatrixWithBacktrack;
+  width: number;
+}
+
+export interface MatrixWithBacktrack {
+  backtrack: Matrix;
+  height: number;
+  matrix: Matrix;
+  sink: Coordinate;
+  source: Coordinate;
+  width: number;
+}
+
+export interface MatrixResult extends MatrixWithBacktrack{
+  reconstruct: Reconstruct;
+}
+
+export const indexToCoordinate = (index: number, width: number): Coordinate => ({
+  x: index % width,
+  y: Math.floor(index / width)
+});
+
+export const coordinateToIndex = ({ x, y }: Coordinate, width: number): number => y * width + x;
+
+export const pathToMatrix = (path: Path, width: number) => doWhile<Matrix>(
+  arr => arr[arr.length - 1].length > width,
+  arr => [...arr.slice(0, arr.length - 1), arr[arr.length - 1].slice(0, width), arr[arr.length - 1].slice(width)],
+  [path]
+);
+
+export const matrixToPath = (matrix: Matrix): Path => matrix.reduce<Path>((path, row) => [...path, ...row], []);
+
+export const pathObjToMatrixObj = (
+  { backtrack, path, sink, source }: PathWithBacktrack,
   width: number,
-  height: number,
-  getPredecessors: (
-    x: number,
-    y: number,
-    getValue: (x: number, y: number) => number
-  ) => MatrixPredecessor[]
-): PathWithBacktrack => computePath(
-  0,
-  width * height - 1,
-  (index, getValue) => getPredecessors(
-    index % width,
-    Math.floor(index / width),
-    (x, y) => y < 0 || x < 0 ? 0 : getValue(y * width + x)
+  height: number
+): MatrixWithBacktrack => ({
+  backtrack: pathToMatrix(backtrack, width),
+  height,
+  matrix: pathToMatrix(path, width),
+  sink: indexToCoordinate(sink, width),
+  source: indexToCoordinate(source, width),
+  width,
+});
+
+export const matrixObjToPathObj = (
+  { backtrack, matrix, sink, source, width }: MatrixWithBacktrack
+): PathWithBacktrack => ({
+  backtrack: matrixToPath(backtrack),
+  path: matrixToPath(matrix),
+  sink: coordinateToIndex(sink, width),
+  source: coordinateToIndex(source, width)
+})
+
+export const computeMatrix = ({
+  getPredecessors,
+  height,
+  outOfBoundsValue = 0,
+  transform = matrix => matrix,
+  width,
+  ...options
+}: ComputeMatrixOptions): MatrixResult => (
+  ({ reconstruct, ...pathObj}: PathResult) => (
+    (matrix: MatrixWithBacktrack) => ({
+      ...matrix,
+      reconstruct: matrixReconstruct(matrix, reconstruct),
+    })
+  )(pathObjToMatrixObj(pathObj, width, height))
+)(computePath({
+  ...options,
+  getPredecessors: (index, getValue) => getPredecessors(
+    indexToCoordinate(index, width),
+    ({x, y}) => y < 0 || x < 0 ? 0 : getValue(coordinateToIndex({ x, y }, width))
   ).filter(
     predecessor => predecessor.x >= 0 && predecessor.y >= 0
   ).map<Predecessor>(
-    ({ weight, x, y }) => ({ index: y * width + x, weight })
+    ({ weight, x, y }) => ({ index: coordinateToIndex({ x, y }, width), weight })
   ),
-  0
-)
+  outOfBoundsValue,
+  sink: width * height - 1,
+  source: 0,
+  transform: path => matrixObjToPathObj(transform(pathObjToMatrixObj(path, width, height)))
+}));
 
-export const isUp = (curr: number, next: number, width: number): boolean => next === curr - width;
-export const isLeft = (curr: number, next: number): boolean => next === curr - 1;
-export const isMatch = (curr: number, next: number, width: number): boolean => next === curr - width - 1;
+const DIRECTIONS = {
+  LEFT: "left",
+  MATCH: "match",
+  SKIP: "skip",
+  UP: "up"
+} as const;
+type Direction = typeof DIRECTIONS[keyof typeof DIRECTIONS];
 
-const maxWidth = memoize(
-  (path: Array<number | string>): number =>
-    path.reduce<number>((max, val) => Math.max(max, val.toString().length + 1), 0)
-);
-
-export const logPath = (path: PathWithBacktrack, width: number) => {
-  const displayPath = (path: Array<number | string>) =>
-    doWhile(
-      arr => arr.length > 0,
-      arr => {
-        console.log(arr.slice(0, width).map(item => item.toString().padStart(maxWidth(path), " ")).join(" "));
-        return arr.slice(width);
-      },
-      path
-    );
-
-  console.log("Path:");
-  displayPath(path.path);
-  console.log("Backtrack:");
-  displayPath(path.backtrack.map((val, i) => isUp(i, val, width) ? `↑(${val})` : isLeft(i, val) ? `←(${val})` : `↖(${val})`));
-  console.log("Source: ", path.source);
-  console.log("Sink: ", path.sink);
+const coordinateToDirection = (curr: Coordinate, next: Coordinate, allowSkip: boolean): Direction => {
+  if (allowSkip && next.x === 0 && next.y === 0) return DIRECTIONS.SKIP;
+  if (curr.x === next.x && curr.y === next.y + 1) return DIRECTIONS.UP;
+  if (curr.x === next.x + 1 && curr.y === next.y) return DIRECTIONS.LEFT;
+  if (curr.x === next.x + 1 && curr.y === next.y + 1) return DIRECTIONS.MATCH;
+  return DIRECTIONS.SKIP;
 }
 
-const BLOSUM62_MATRIX: Matrix = `
- 4  0 -2 -1 -2  0 -2 -1 -1 -1 -1 -2 -1 -1 -1  1  0  0 -3 -2
- 0  9 -3 -4 -2 -3 -3 -1 -3 -1 -1 -3 -3 -3 -3 -1 -1 -1 -2 -2
--2 -3  6  2 -3 -1 -1 -3 -1 -4 -3  1 -1  0 -2  0 -1 -3 -4 -3
--1 -4  2  5 -3 -2  0 -3  1 -3 -2  0 -1  2  0  0 -1 -2 -3 -2
--2 -2 -3 -3  6 -3 -1  0 -3  0  0 -3 -4 -3 -3 -2 -2 -1  1  3
- 0 -3 -1 -2 -3  6 -2 -4 -2 -4 -3  0 -2 -2 -2  0 -2 -3 -2 -3
--2 -3 -1  0 -1 -2  8 -3 -1 -3 -2  1 -2  0  0 -1 -2 -3 -2  2
--1 -1 -3 -3  0 -4 -3  4 -3  2  1 -3 -3 -3 -3 -2 -1  3 -3 -1
--1 -3 -1  1 -3 -2 -1 -3  5 -2 -1  0 -1  1  2  0 -1 -2 -3 -2
--1 -1 -4 -3  0 -4 -3  2 -2  4  2 -3 -3 -2 -2 -2 -1  1 -2 -1
--1 -1 -3 -2  0 -3 -2  1 -1  2  5 -2 -2  0 -1 -1 -1  1 -1 -1
--2 -3  1  0 -3  0  1 -3  0 -3 -2  6 -2  0  0  1  0 -3 -4 -2
--1 -3 -1 -1 -4 -2 -2 -3 -1 -3 -2 -2  7 -1 -2 -1 -1 -2 -4 -3
--1 -3  0  2 -3 -2  0 -3  1 -2  0  0 -1  5  1  0 -1 -2 -2 -1
--1 -3 -2  0 -3 -2  0 -3  2 -2 -1  0 -2  1  5 -1 -1 -3 -3 -2
- 1 -1  0  0 -2  0 -1 -2  0 -2 -1  1 -1  0 -1  4  1 -2 -3 -2
- 0 -1 -1 -1 -2 -2 -2 -1 -1 -1 -1  0 -1 -1 -1  1  5  0 -2 -2
- 0 -1 -3 -2 -1 -3 -3  3 -2  1  1 -3 -2 -2 -3 -2  0  4 -3 -1
--3 -2 -4 -3  1 -2 -2 -3 -3 -2 -1 -4 -4 -2 -3 -3 -2 -3 11  2
--2 -2 -3 -2  3 -3  2 -1 -2 -1 -1 -2 -3 -1 -2 -2 -2 -1  2  7
-`.trim().split("\n").map(row => row.trim().split(/\s+/).map(num => parseInt(num)));
+type Reconstruct = <Result>(
+  callback: (
+    result: Result,
+    curr: Coordinate,
+    next: Coordinate,
+    stringForDirection: StringForDirection,
+    data: MatrixWithBacktrack
+  ) => Result,
+  initialResult: Result | ((data: MatrixWithBacktrack) => Result)
+) => Result;
 
-export const scoreAminos = (scoringMatrix: Matrix = BLOSUM62_MATRIX) =>
-  (amino1: Amino, amino2: Amino): number =>
-    scoringMatrix[aminoIndex(amino1)][aminoIndex(amino2)];
+const matrixReconstruct = (matrix: MatrixWithBacktrack, reconstruct: PathReconstruct): Reconstruct =>
+  (callback, initialResult) => reconstruct(
+    (result, curr, next) => (
+      (curr: Coordinate, next: Coordinate) => callback(
+        result,
+        curr,
+        next,
+        stringForDirection(curr, next),
+        matrix
+      )
+    )(indexToCoordinate(curr, matrix.width), indexToCoordinate(next, matrix.width)),
+    initialResult instanceof Function ? initialResult(matrix) : initialResult
+  );
+
+type DirectionStrings = Partial<Record<Direction, string>>;
+
+type StringForDirection = (directionStrings: DirectionStrings, allowSkip?: boolean) => string;
+
+const stringForDirection = (curr: Coordinate, next: Coordinate) =>
+  (directionStrings: DirectionStrings, allowSkip: boolean = true) =>
+    directionStrings[coordinateToDirection(curr, next, allowSkip)] || "";
